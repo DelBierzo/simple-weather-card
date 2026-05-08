@@ -1,4 +1,5 @@
 module.exports = {
+  mode: 'production',
   entry: './src/main.js',
   output: {
     filename: 'simple-weather-card.js'
@@ -15,29 +16,27 @@ module.exports = {
               [
                 "@babel/preset-env",
                 {
-                  "modules": 'commonjs',
+                  "modules": false,
                   "targets": "> 5%, not dead",
                 }
               ],
             ],
             plugins: [
               ["@babel/plugin-transform-template-literals"],
-              ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true } ],
-              ["@babel/plugin-proposal-class-properties"],
+              ['@babel/plugin-proposal-decorators', { version: "legacy" }],
+              ["@babel/plugin-transform-class-properties", { loose: true }],
             ],
           },
         },
       },
       {
         test: /\.(png|svg)$/i,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 8192
-            },
-          },
-        ],
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8192
+          }
+        }
       },
     ],
   },
