@@ -6,7 +6,8 @@
     "strict": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "lib": ["ES2020", "DOM"]
+    "lib": ["ES2020", "DOM"],
+    "skipLibCheck": true
   },
   "include": ["src/**/*"]
 }
