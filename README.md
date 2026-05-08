@@ -36,7 +36,7 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 #### Card options
 
 | Name           | Type                                    | Default         | Since  | Description                                                                                  |
-| -------------- | --------------------------------------- | --------------- | ------ | -------------------------------------------------------------------------------------------- |
+|----------------|-----------------------------------------|-----------------|--------|----------------------------------------------------------------------------------------------|
 | type           | string                                  | **required**    | v0.1.0 | `custom:simple-weather-card`                                                                 |
 | entity         | string                                  | **required**    | v0.1.0 | The entity_id from an entity within the `weather` domain.                                    |
 | name           | string                                  | optional        | v0.1.0 | Set a custom name.                                                                           |
@@ -49,7 +49,7 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 #### Weather attributes
 
 | Name                      | Description                       |
-| ------------------------- | --------------------------------- |
+|---------------------------|-----------------------------------|
 | extrema                   | Forecast high and low temperature |
 | precipitation             | Forecast precipitation            |
 | precipitation_probability | Probability of precipitation      |
@@ -63,7 +63,7 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 See [Backdrop example](#backdrop-example) for example usage.
 
 | Name  | Type    | Default                  | Description               |
-| ----- | ------- | ------------------------ | ------------------------- |
+|-------|---------|--------------------------|---------------------------|
 | fade  | boolean | `false`                  | Faded background.         |
 | day   | string  | '#45aaf2'                | Background color (Day).   |
 | night | string  | '#a55eea'                | Background color (Night). |
@@ -84,7 +84,7 @@ custom:
 #### Action object options
 
 | Name            | Type   | Default     | Options                                         | Description                                                                             |
-| --------------- | ------ | ----------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
+|-----------------|--------|-------------|-------------------------------------------------|-----------------------------------------------------------------------------------------|
 | action          | string | `more-info` | `more-info`, `navigate`, `call-service`, `none` | Action to perform                                                                       |
 | service         | string | none        | Any service                                     | Service to call (e.g. `media_player.toggle`) when `action` is defined as `call-service` |
 | service_data    | object | none        | Any service data                                | Service data to include with the service call (e.g. `entity_id: media_player.office`)   |
