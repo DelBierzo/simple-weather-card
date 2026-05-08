@@ -1,4 +1,6 @@
-function getStyles(css) {
+import { css, CSSResult } from "lit";
+
+export default function getStyles(): CSSResult {
   return css`
     ha-card {
       display: flex;
@@ -39,7 +41,7 @@ function getStyles(css) {
       width: 1em;
       min-width: 1em;
       flex: initial;
-      margin: 0 .2em;
+      margin: 0 0.2em;
     }
     .weather__info {
       display: flex;
@@ -72,5 +74,3 @@ function getStyles(css) {
     }
   `;
 }
-
-export default getStyles;

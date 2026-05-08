@@ -14,8 +14,9 @@ import sunny from "../icons/sunny.png";
 import windy from "../icons/windy.svg";
 import humidity from "../icons/humidity.svg";
 import pressure from "../icons/pressure.svg";
+import { HomeAssistant, HassEntity, ForecastEntry } from "./types";
 
-const ICONS = {
+const ICONS: Record<string, string> = {
   "clear-day": sunny,
   "clear-night": clear_night,
   cloudy,
@@ -42,7 +43,7 @@ const ICONS = {
   pressure,
 };
 
-const ICONS_NIGHT = {
+const ICONS_NIGHT: Record<string, string> = {
   ...ICONS,
   sunny: clear_night,
   partlycloudy: mostly_cloudy_night,
@@ -50,33 +51,24 @@ const ICONS_NIGHT = {
 };
 
 const DIRECTION = [
-  "N",
-  "NNE",
-  "NE",
-  "ENE",
-  "E",
-  "ESE",
-  "SE",
-  "SSE",
-  "S",
-  "SSW",
-  "SW",
-  "WSW",
-  "W",
-  "WNW",
-  "NW",
-  "NNW",
+  "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+  "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
 ];
 
 export default class WeatherEntity {
-  constructor(hass, entity) {
+  private hass: HomeAssistant;
+  private entity: HassEntity;
+  private attr: HassEntityAttributes;
+  private forecast: ForecastEntry[];
+
+  constructor(hass: HomeAssistant, entity: HassEntity) {
     this.hass = hass;
     this.entity = entity;
     this.attr = entity.attributes;
-    this.forecast = entity.attributes.forecast || [[]];
+    this.forecast = (entity.attributes.forecast as ForecastEntry[] | undefined) ?? [{}];
   }
 
-  get state() {
+  get state(): string {
     if (this.useComponentEntityTranslations()) {
       return this.toLocale(
         "component.weather.entity_component._.state." + this.entity.state,
@@ -89,77 +81,78 @@ export default class WeatherEntity {
     );
   }
 
-  get hasState() {
-    return this.entity.state && this.entity.state !== "unknown";
+  get hasState(): boolean {
+    return Boolean(this.entity.state) && this.entity.state !== "unknown";
   }
 
-  get temp() {
+  get temp(): number | undefined {
     return this.attr.temperature;
   }
 
-  get name() {
+  get name(): string | undefined {
     return this.attr.friendly_name;
   }
 
-  get high() {
-    return this.forecast[0].temperature;
+  get high(): number | undefined {
+    return this.forecast[0]?.temperature;
   }
 
-  get low() {
-    return this.forecast[0].templow;
+  get low(): number | undefined {
+    return this.forecast[0]?.templow;
   }
 
-  get wind_speed() {
-    return this.attr.wind_speed || 0;
+  get wind_speed(): number {
+    return this.attr.wind_speed ?? 0;
   }
 
-  get pressure() {
-    return this.attr.pressure || 0;
+  get pressure(): number {
+    return this.attr.pressure ?? 0;
   }
 
-  get wind_bearing() {
-    return this.attr.wind_bearing !== "undefined"
-      ? this.degToDirection(this.attr.wind_bearing)
+  get wind_bearing(): string {
+    const bearing = this.attr.wind_bearing;
+    return bearing !== undefined
+      ? this.degToDirection(bearing)
       : this.toLocale("state.default.unknown");
   }
 
-  get precipitation() {
-    return Math.round((this.forecast[0].precipitation || 0) * 100) / 100;
+  get precipitation(): number {
+    return Math.round((this.forecast[0]?.precipitation ?? 0) * 100) / 100;
   }
 
-  get precipitation_probability() {
-    return this.forecast[0].precipitation_probability || 0;
+  get precipitation_probability(): number {
+    return this.forecast[0]?.precipitation_probability ?? 0;
   }
 
-  get humidity() {
-    return this.attr.humidity || 0;
+  get humidity(): number {
+    return this.attr.humidity ?? 0;
   }
 
-  get isNight() {
-    return this.hass.states["sun.sun"]
-      ? this.hass.states["sun.sun"].state === "below_horizon"
-      : false;
+  get isNight(): boolean {
+    return this.hass.states["sun.sun"]?.state === "below_horizon";
   }
 
-  get icon() {
+  get icon(): string | undefined {
     const state = this.entity.state.toLowerCase();
     return this.isNight ? ICONS_NIGHT[state] : ICONS[state];
   }
 
-  getIcon(icon) {
+  getIcon(icon: string): string {
     return ICONS[icon];
   }
 
-  toLocale(string, fallback = "unknown") {
+  toLocale(string: string, fallback = "unknown"): string {
     return this.hass.localize(string) || fallback;
   }
 
-  useComponentEntityTranslations() {
-    return Number(this.hass.connection.haVersion.replaceAll(".", "")) >= 202340;
+  useComponentEntityTranslations(): boolean {
+    return Number(this.hass.connection.haVersion.split(".").join("")) >= 202340;
   }
 
-  degToDirection(deg) {
+  degToDirection(deg: number): string {
     const dir = Math.floor(deg / 22.5 + 0.5);
     return DIRECTION[dir % 16];
   }
 }
+
+type HassEntityAttributes = HassEntity["attributes"];
