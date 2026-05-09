@@ -102,27 +102,27 @@ export class SimpleWeatherCard extends LitElement {
     this._forecastUnsubscribe?.();
     this._forecastUnsubscribe = undefined;
 
-    this._hass!.connection
-      .subscribeMessage<{ forecast: ForecastEntry[] | null }>(
-        (msg) => {
-          this._forecast = msg.forecast ?? [];
-          if (this.entity) {
-            this.weather = new WeatherEntity(
-              this._hass!,
-              this.entity,
-              this._forecast,
-            );
-          }
-        },
-        {
-          type: "weather/subscribe_forecast",
-          forecast_type: "daily",
-          entity_id: entityId,
-        },
-      )
-      .then((unsub) => {
-        this._forecastUnsubscribe = unsub;
-      });
+    this._hass!.connection.subscribeMessage<{
+      forecast: ForecastEntry[] | null;
+    }>(
+      (msg) => {
+        this._forecast = msg.forecast ?? [];
+        if (this.entity) {
+          this.weather = new WeatherEntity(
+            this._hass!,
+            this.entity,
+            this._forecast,
+          );
+        }
+      },
+      {
+        type: "weather/subscribe_forecast",
+        forecast_type: "daily",
+        entity_id: entityId,
+      },
+    ).then((unsub) => {
+      this._forecastUnsubscribe = unsub;
+    });
   }
 
   private get name(): string {
