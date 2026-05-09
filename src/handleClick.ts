@@ -25,10 +25,13 @@ export const handleClick = (
       window.dispatchEvent(e);
       break;
     }
+    case "perform_action":
     case "call-service": {
-      if (!actionConfig.service) return;
-      const [domain, service] = actionConfig.service.split(".", 2);
-      hass.callService(domain, service, { ...actionConfig.service_data });
+      const action = actionConfig.perform_action ?? actionConfig.service;
+      if (!action) return;
+      const [domain, service] = action.split(".", 2);
+      const serviceData = actionConfig.data ?? actionConfig.service_data;
+      hass.callService(domain, service, { ...serviceData });
       break;
     }
   }

@@ -93,10 +93,10 @@ export default class WeatherEntity {
   }
 
   get state(): string {
-    const prefix = this.useComponentEntityTranslations()
-      ? "component.weather.entity_component._.state."
-      : "component.weather.state._.";
-    return this.toLocale(prefix + this.entity.state, this.entity.state);
+    return this.toLocale(
+      "component.weather.entity_component._.state." + this.entity.state,
+      this.entity.state,
+    );
   }
 
   get hasState(): boolean {
@@ -167,10 +167,6 @@ export default class WeatherEntity {
 
   toLocale(string: string, fallback = "unknown"): string {
     return this.hass.localize(string) || fallback;
-  }
-
-  useComponentEntityTranslations(): boolean {
-    return Number(this.hass.connection.haVersion.split(".").join("")) >= 202340;
   }
 
   degToDirection(deg: number): string {

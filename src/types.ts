@@ -66,7 +66,11 @@ export interface TapAction {
   action: string;
   entity?: string;
   navigation_path?: string;
+  perform_action?: string;
+  data?: Record<string, unknown>;
+  /** @deprecated use perform_action */
   service?: string;
+  /** @deprecated use data */
   service_data?: Record<string, unknown>;
 }
 

@@ -60,6 +60,13 @@ export class SimpleWeatherCard extends LitElement {
 
   static styles = getStyles();
 
+  static getStubConfig(hass: HomeAssistant): Partial<CardConfig> {
+    const entity = Object.keys(hass.states).find((e) =>
+      e.startsWith("weather."),
+    );
+    return { entity };
+  }
+
   set hass(hass: HomeAssistant) {
     const { custom, entity } = this.config;
 
