@@ -4,7 +4,7 @@
 
 > A fork of [simple-weather-card](https://github.com/kalkih/simple-weather-card) by [@kalkih](https://github.com/kalkih), kept up to date with current Home Assistant releases.
 
-A clean, highly configurable weather card for the [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI, inspired by Google Material Design.
+A clean, highly configurable weather card for the [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI, inspired by Google Material Design. Kept up to date with the latest Home Assistant standards, easy to install via HACS, and comes with a built-in UI editor so you can configure the card without writing YAML.
 
 ![Preview](https://user-images.githubusercontent.com/457678/53588519-61dfdf80-3b8d-11e9-9f0d-f5995ba794ce.png)
 
@@ -33,7 +33,12 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 
 ## Using the card
 
-### Options
+### UI Editor
+
+The card includes a built-in UI editor. Click the card in the Lovelace dashboard and select **Edit** to configure it visually — no need to write YAML for most options.
+tap_actions is only supported in YAML. 
+
+### YAML Editor
 
 #### Card options
 
