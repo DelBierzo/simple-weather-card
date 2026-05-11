@@ -10,7 +10,7 @@ const fireEvent = (node: EventTarget, type: string, detail?: unknown): void => {
 };
 
 const INFO_OPTIONS = [
-  { value: "extrema", label: "High / Low" },
+  { value: "extrema", label: "Low / High" },
   { value: "precipitation", label: "Precipitation" },
   { value: "precipitation_probability", label: "Precipitation probability" },
   { value: "humidity", label: "Humidity" },
@@ -33,44 +33,61 @@ const CUSTOM_KEYS: { key: string; label: string }[] = [
   { key: "pressure", label: "Pressure" },
 ];
 
-const SCHEMA = [
+const ENTITY_SCHEMA = [
   {
     name: "entity",
     required: true,
     selector: { entity: { domain: "weather" } },
   },
-  { name: "name", selector: { text: {} } },
+];
+
+const NAME_SCHEMA = [
   { name: "show_name", selector: { boolean: {} } },
+  { name: "name", selector: { text: {} } },
+];
+
+const PRIMARY_INFO_SCHEMA = [
   {
     name: "primary_info",
     selector: {
       select: { multiple: true, mode: "list", options: INFO_OPTIONS },
     },
   },
+];
+
+const SECONDARY_INFO_SCHEMA = [
   {
     name: "secondary_info",
     selector: {
       select: { multiple: true, mode: "list", options: INFO_OPTIONS },
     },
   },
+];
+
+const TAP_ACTION_SCHEMA = [
   {
-    type: "expandable",
-    name: "backdrop",
-    title: "Backdrop",
-    schema: [
-      { name: "bg", selector: { boolean: {} } },
-      { name: "day", selector: { text: {} } },
-      { name: "night", selector: { text: {} } },
-      { name: "text", selector: { text: {} } },
-      { name: "fade", selector: { boolean: {} } },
-    ],
+    name: "tap_action",
+    selector: {
+      ui_action: {
+        default_action: "more-info",
+      },
+    },
   },
+];
+
+const BACKDROP_SCHEMA = [
+    { name: "bg", selector: { boolean: {} } },
+    { name: "fade", selector: { boolean: {} } },
+    { name: "day", selector: { text: {} } },
+    { name: "night", selector: { text: {} } },
+    { name: "text", selector: { text: {} } },
 ];
 
 const LABELS: Record<string, string> = {
   entity: "Weather entity",
   name: "Name",
   show_name: "Show name",
+  tap_action: "Tap action",
   bg: "Show backdrop",
   primary_info: "Primary info",
   secondary_info: "Secondary info",
@@ -106,6 +123,9 @@ export class SimpleWeatherCardEditor extends LitElement {
     ha-expansion-panel {
       margin-top: 8px;
     }
+    .section-content {
+      padding: 8px 16px 16px;
+    }
     .custom-content {
       display: flex;
       flex-direction: column;
@@ -118,6 +138,8 @@ export class SimpleWeatherCardEditor extends LitElement {
     this._customMap = customToMap(config.custom);
     this._config = {
       ...config,
+      show_name: config.show_name ?? true,
+      tap_action: config.tap_action ?? { action: "more-info" },
       primary_info: toArray(config.primary_info, ["extrema"]),
       secondary_info: toArray(config.secondary_info, ["precipitation"]),
     };
@@ -125,7 +147,17 @@ export class SimpleWeatherCardEditor extends LitElement {
 
   private _valueChanged(ev: CustomEvent): void {
     fireEvent(this, "config-changed", {
-      config: { ...ev.detail.value, custom: mapToCustom(this._customMap) },
+      config: { ...this._config, ...ev.detail.value, custom: mapToCustom(this._customMap) },
+    });
+  }
+
+  private _backdropChanged(ev: CustomEvent): void {
+    fireEvent(this, "config-changed", {
+      config: {
+        ...this._config,
+        backdrop: { ...this._config?.backdrop, ...ev.detail.value },
+        custom: mapToCustom(this._customMap),
+      },
     });
   }
 
@@ -149,11 +181,82 @@ export class SimpleWeatherCardEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${SCHEMA}
+        .schema=${ENTITY_SCHEMA}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._valueChanged}
       ></ha-form>
-      <ha-expansion-panel .header=${"Custom sensor overrides"} outlined>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-header-1"></ha-icon> Name</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${NAME_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-list-bulleted"></ha-icon> Primary info</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${PRIMARY_INFO_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-list-bulleted"></ha-icon> Secondary info</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${SECONDARY_INFO_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:gesture-tap"></ha-icon> Tap action</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${TAP_ACTION_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+        ><ha-icon icon="mdi:palette"></ha-icon> Backdrop</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config?.backdrop ?? {}}
+            .schema=${BACKDROP_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._backdropChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"><ha-icon icon="mdi:cog"></ha-icon> Custom sensor overrides</span>
         <div class="custom-content">
           ${CUSTOM_KEYS.map(
             ({ key, label }) => html`

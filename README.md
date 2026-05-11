@@ -33,10 +33,8 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 
 ## Using the card
 
-### UI Editor
-
-The card includes a built-in UI editor. Click the card in the Lovelace dashboard and select **Edit** to configure it visually — no need to write YAML for most options.
-tap_actions is only supported in YAML. 
+### New UI Editor
+![editor](/images/editor.png)
 
 ### YAML Editor
 
