@@ -33,50 +33,38 @@ const CUSTOM_KEYS: { key: string; label: string }[] = [
   { key: "pressure", label: "Pressure" },
 ];
 
-const SCHEMA = [
+const ENTITY_SCHEMA = [
   {
     name: "entity",
     required: true,
     selector: { entity: { domain: "weather" } },
   },
+];
+
+const NAME_SCHEMA = [
+  { name: "show_name", selector: { boolean: {} } },
+  { name: "name", selector: { text: {} } },
+];
+
+const PRIMARY_INFO_SCHEMA = [
   {
-    type: "expandable",
-    name: "name_section",
-    title: "Name",
-    icon: "mdi:format-header-1",
-    schema: [
-      { name: "show_name", selector: { boolean: {} } },
-      { name: "name", selector: { text: {} } },
-    ],
+    name: "primary_info",
+    selector: {
+      select: { multiple: true, mode: "list", options: INFO_OPTIONS },
+    },
   },
+];
+
+const SECONDARY_INFO_SCHEMA = [
   {
-    type: "expandable",
-    name: "primary_info_section",
-    title: "Primary info",
-    icon: "mdi:format-list-bulleted",
-    schema: [
-      {
-        name: "primary_info",
-        selector: {
-          select: { multiple: true, mode: "list", options: INFO_OPTIONS },
-        },
-      },
-    ],
+    name: "secondary_info",
+    selector: {
+      select: { multiple: true, mode: "list", options: INFO_OPTIONS },
+    },
   },
-  {
-    type: "expandable",
-    name: "secondary_info_section",
-    title: "Secondary info",
-    icon: "mdi:format-list-bulleted",
-    schema: [
-      {
-        name: "secondary_info",
-        selector: {
-          select: { multiple: true, mode: "list", options: INFO_OPTIONS },
-        },
-      },
-    ],
-  },
+];
+
+const BACKDROP_SCHEMA = [
   {
     type: "expandable",
     name: "backdrop",
@@ -131,6 +119,9 @@ export class SimpleWeatherCardEditor extends LitElement {
     ha-expansion-panel {
       margin-top: 8px;
     }
+    .section-content {
+      padding: 8px 16px 16px;
+    }
     .custom-content {
       display: flex;
       flex-direction: column;
@@ -151,7 +142,7 @@ export class SimpleWeatherCardEditor extends LitElement {
 
   private _valueChanged(ev: CustomEvent): void {
     fireEvent(this, "config-changed", {
-      config: { ...ev.detail.value, custom: mapToCustom(this._customMap) },
+      config: { ...this._config, ...ev.detail.value, custom: mapToCustom(this._customMap) },
     });
   }
 
@@ -175,7 +166,56 @@ export class SimpleWeatherCardEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${SCHEMA}
+        .schema=${ENTITY_SCHEMA}
+        .computeLabel=${this._computeLabel}
+        @value-changed=${this._valueChanged}
+      ></ha-form>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-header-1"></ha-icon> Name</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${NAME_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-list-bulleted"></ha-icon> Primary info</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${PRIMARY_INFO_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:format-list-bulleted"></ha-icon> Secondary info</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${SECONDARY_INFO_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-form
+        .hass=${this.hass}
+        .data=${this._config}
+        .schema=${BACKDROP_SCHEMA}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._valueChanged}
       ></ha-form>
