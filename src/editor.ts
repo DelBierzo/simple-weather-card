@@ -39,8 +39,16 @@ const SCHEMA = [
     required: true,
     selector: { entity: { domain: "weather" } },
   },
-  { name: "name", selector: { text: {} } },
-  { name: "show_name", selector: { boolean: {} } },
+  {
+    type: "expandable",
+    name: "name_section",
+    title: "Name",
+    icon: "mdi:format-header-1",
+    schema: [
+      { name: "show_name", selector: { boolean: {} } },
+      { name: "name", selector: { text: {} } },
+    ],
+  },
   {
     type: "expandable",
     name: "primary_info_section",
@@ -76,10 +84,10 @@ const SCHEMA = [
     icon: "mdi:palette",
     schema: [
       { name: "bg", selector: { boolean: {} } },
+      { name: "fade", selector: { boolean: {} } },
       { name: "day", selector: { text: {} } },
       { name: "night", selector: { text: {} } },
       { name: "text", selector: { text: {} } },
-      { name: "fade", selector: { boolean: {} } },
     ],
   },
 ];
