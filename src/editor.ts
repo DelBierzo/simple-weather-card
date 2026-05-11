@@ -10,7 +10,7 @@ const fireEvent = (node: EventTarget, type: string, detail?: unknown): void => {
 };
 
 const INFO_OPTIONS = [
-  { value: "extrema", label: "High / Low" },
+  { value: "extrema", label: "Low / High" },
   { value: "precipitation", label: "Precipitation" },
   { value: "precipitation_probability", label: "Precipitation probability" },
   { value: "humidity", label: "Humidity" },
