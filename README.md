@@ -44,16 +44,18 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 
 #### Card options
 
-| Name           | Type                                    | Default         | Since  | Description                                                                                  |
-|----------------|-----------------------------------------|-----------------|--------|----------------------------------------------------------------------------------------------|
-| type           | string                                  | **required**    | v0.1.0 | `custom:simple-weather-card`                                                                 |
-| entity         | string                                  | **required**    | v0.1.0 | The entity_id from an entity within the `weather` domain.                                    |
-| name           | string                                  | optional        | v0.1.0 | Set a custom name.                                                                           |
-| primary_info   | array/string                            | `extrema`       | v0.7.0 | Primary card information, one or more [weather attributes](#weather-attributes)              |
-| secondary_info | array/string                            | `precipitation` | v0.2.0 | Secondary card information, one or more [weather attributes](#weather-attributes)            |
-| backdrop       | boolean/object                          | `false`         | v0.1.0 | Colored background, accepts `true/false` or a [Backdrop object](#backdrop-object-options).   |
-| custom         | array                                   | optional        | v0.4.0 | Override weather information with custom sensors, see [Custom option](#custom-option-array). |
-| tap_action     | [action object](#action-object-options) | optional        | v0.5.0 | Action on click/tap.                                                                         |
+| Name           | Type                                        | Default         | Since  | Description                                                                                  |
+|----------------|---------------------------------------------|-----------------|--------|----------------------------------------------------------------------------------------------|
+| type           | string                                      | **required**    | v0.1.0 | `custom:simple-weather-card`                                                                 |
+| entity         | string                                      | **required**    | v0.1.0 | The entity_id from an entity within the `weather` domain.                                    |
+| name           | string                                      | optional        | v0.1.0 | Set a custom name.                                                                           |
+| primary_info   | array/string                                | `extrema`       | v0.7.0 | Primary card information, one or more [weather attributes](#weather-attributes)              |
+| secondary_info | array/string                                | `precipitation` | v0.2.0 | Secondary card information, one or more [weather attributes](#weather-attributes)            |
+| backdrop       | [Backdrop object](#backdrop-object-options) | optional        | v2.0.0 | [Backdrop object](#backdrop-object-options).                                                 |
+| custom         | array                                       | optional        | v0.4.0 | Override weather information with custom sensors, see [Custom option](#custom-option-array). |
+| tap_action     | [action object](#action-object-options)     | optional        | v0.5.0 | Action on click/tap.                                                                         |
+| show_name      | boolean                                     | true            | v2.1.0 | Show/Hide name                                                                               |
+| show_forecast  | boolean                                     | false           | v2.5.0 | Show/Hide 5 day forecast                                                                     |
 
 #### Weather attributes
 
@@ -73,6 +75,7 @@ See [Backdrop example](#backdrop-example) for example usage.
 
 | Name  | Type    | Default                  | Description               |
 |-------|---------|--------------------------|---------------------------|
+| bg    | boolean | `false`                  | Colored background.       |
 | fade  | boolean | `false`                  | Faded background.         |
 | day   | string  | '#45aaf2'                | Background color (Day).   |
 | night | string  | '#a55eea'                | Background color (Night). |
