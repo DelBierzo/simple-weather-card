@@ -159,6 +159,7 @@ export class SimpleWeatherCardEditor extends LitElement {
       tap_action: config.tap_action ?? { action: "more-info" },
       primary_info: toArray(config.primary_info, ["extrema"]),
       secondary_info: toArray(config.secondary_info, ["precipitation"]),
+      forecast_type: config.forecast_type ?? "daily",
     };
   }
 
@@ -202,13 +203,6 @@ export class SimpleWeatherCardEditor extends LitElement {
         .computeLabel=${this._computeLabel}
         @value-changed=${this._valueChanged}
       ></ha-form>
-      <ha-form
-          .hass=${this.hass}
-          .data=${this._config}
-          .schema=${FORECAST_SCHEMA}
-          .computeLabel=${this._computeLabel}
-          @value-changed=${this._valueChanged}
-      ></ha-form>
       <ha-expansion-panel outlined>
         <span slot="header"
           ><ha-icon icon="mdi:format-header-1"></ha-icon> Name</span
@@ -246,6 +240,20 @@ export class SimpleWeatherCardEditor extends LitElement {
             .hass=${this.hass}
             .data=${this._config}
             .schema=${SECONDARY_INFO_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
+          ><ha-icon icon="mdi:weather-partly-cloudy"></ha-icon> Forecast</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${FORECAST_SCHEMA}
             .computeLabel=${this._computeLabel}
             @value-changed=${this._valueChanged}
           ></ha-form>
