@@ -66,6 +66,17 @@ const SECONDARY_INFO_SCHEMA = [
 
 const FORECAST_SCHEMA = [
   { name: "show_forecast", selector: { boolean: {} } },
+  {
+    name: "forecast_type",
+    selector: {
+      select: {
+        options: [
+          { value: "daily", label: "Daily" },
+          { value: "hourly", label: "Hourly" },
+        ],
+      },
+    },
+  },
 ];
 
 const TAP_ACTION_SCHEMA = [
@@ -80,18 +91,19 @@ const TAP_ACTION_SCHEMA = [
 ];
 
 const BACKDROP_SCHEMA = [
-    { name: "bg", selector: { boolean: {} } },
-    { name: "fade", selector: { boolean: {} } },
-    { name: "day", selector: { text: {} } },
-    { name: "night", selector: { text: {} } },
-    { name: "text", selector: { text: {} } },
+  { name: "bg", selector: { boolean: {} } },
+  { name: "fade", selector: { boolean: {} } },
+  { name: "day", selector: { color_rgb: {} } },
+  { name: "night", selector: { color_rgb: {} } },
+  { name: "text", selector: { color_rgb: {} } },
 ];
 
 const LABELS: Record<string, string> = {
   entity: "Weather entity",
   name: "Name",
   show_name: "Show name",
-  show_forecast: "Show 5-day forecast",
+  show_forecast: "Show forecast",
+  forecast_type: "Forecast type",
   tap_action: "Tap action",
   bg: "Show backdrop",
   primary_info: "Primary info",
@@ -101,6 +113,26 @@ const LABELS: Record<string, string> = {
   night: "Night color",
   text: "Text color",
   fade: "Fade effect",
+};
+
+const hexToRgb = (hex: string): [number, number, number] => {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 0, 0];
+};
+
+const rgbToHex = ([r, g, b]: [number, number, number]): string =>
+  "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+
+const resolveTextColor = (text?: string): [number, number, number] => {
+  if (text && /^#/.test(text)) return hexToRgb(text);
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--primary-text-color")
+    .trim();
+  const hex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(raw);
+  if (hex) return [parseInt(hex[1], 16), parseInt(hex[2], 16), parseInt(hex[3], 16)];
+  const rgb = /rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(raw);
+  if (rgb) return [parseInt(rgb[1]), parseInt(rgb[2]), parseInt(rgb[3])];
+  return [255, 255, 255];
 };
 
 const toArray = (val: string | string[] | undefined, fallback: string[]) =>
@@ -147,6 +179,7 @@ export class SimpleWeatherCardEditor extends LitElement {
       tap_action: config.tap_action ?? { action: "more-info" },
       primary_info: toArray(config.primary_info, ["extrema"]),
       secondary_info: toArray(config.secondary_info, ["precipitation"]),
+      forecast_type: config.forecast_type ?? "daily",
     };
   }
 
@@ -157,12 +190,15 @@ export class SimpleWeatherCardEditor extends LitElement {
   }
 
   private _backdropChanged(ev: CustomEvent): void {
+    const val = ev.detail.value as Record<string, unknown>;
+    const backdrop = {
+      ...this._config?.backdrop,
+      ...val,
+      ...(Array.isArray(val.day) && { day: rgbToHex(val.day as [number, number, number]) }),
+      ...(Array.isArray(val.night) && { night: rgbToHex(val.night as [number, number, number]) }),
+      ...(Array.isArray(val.text) && { text: rgbToHex(val.text as [number, number, number]) }),    };
     fireEvent(this, "config-changed", {
-      config: {
-        ...this._config,
-        backdrop: { ...this._config?.backdrop, ...ev.detail.value },
-        custom: mapToCustom(this._customMap),
-      },
+      config: { ...this._config, backdrop, custom: mapToCustom(this._customMap) },
     });
   }
 
@@ -189,13 +225,6 @@ export class SimpleWeatherCardEditor extends LitElement {
         .schema=${ENTITY_SCHEMA}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._valueChanged}
-      ></ha-form>
-      <ha-form
-          .hass=${this.hass}
-          .data=${this._config}
-          .schema=${FORECAST_SCHEMA}
-          .computeLabel=${this._computeLabel}
-          @value-changed=${this._valueChanged}
       ></ha-form>
       <ha-expansion-panel outlined>
         <span slot="header"
@@ -241,6 +270,20 @@ export class SimpleWeatherCardEditor extends LitElement {
       </ha-expansion-panel>
       <ha-expansion-panel outlined>
         <span slot="header"
+          ><ha-icon icon="mdi:weather-partly-cloudy"></ha-icon> Forecast</span
+        >
+        <div class="section-content">
+          <ha-form
+            .hass=${this.hass}
+            .data=${this._config}
+            .schema=${FORECAST_SCHEMA}
+            .computeLabel=${this._computeLabel}
+            @value-changed=${this._valueChanged}
+          ></ha-form>
+        </div>
+      </ha-expansion-panel>
+      <ha-expansion-panel outlined>
+        <span slot="header"
           ><ha-icon icon="mdi:gesture-tap"></ha-icon> Tap action</span
         >
         <div class="section-content">
@@ -260,7 +303,12 @@ export class SimpleWeatherCardEditor extends LitElement {
         <div class="section-content">
           <ha-form
             .hass=${this.hass}
-            .data=${this._config?.backdrop ?? {}}
+            .data=${{
+              ...this._config?.backdrop,
+              day: hexToRgb(this._config?.backdrop?.day ?? "#45aaf2"),
+              night: hexToRgb(this._config?.backdrop?.night ?? "#a55eea"),
+              text: resolveTextColor(this._config?.backdrop?.text),
+            }}
             .schema=${BACKDROP_SCHEMA}
             .computeLabel=${this._computeLabel}
             @value-changed=${this._backdropChanged}
