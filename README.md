@@ -56,6 +56,7 @@ If you're migrating from the [original repository](https://github.com/kalkih/sim
 | tap_action     | [action object](#action-object-options)     | optional        | v0.5.0 | Action on click/tap.                                                                         |
 | show_name      | boolean                                     | true            | v2.1.0 | Show/Hide name                                                                               |
 | show_forecast  | boolean                                     | false           | v2.5.0 | Show/Hide 5 day forecast                                                                     |
+| forecast_type  | string                                      | `daily`         | v2.6.0 | Show daily or hourly forecast                                                                |
 
 #### Weather attributes
 
