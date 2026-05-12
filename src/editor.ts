@@ -95,7 +95,7 @@ const BACKDROP_SCHEMA = [
   { name: "fade", selector: { boolean: {} } },
   { name: "day", selector: { color_rgb: {} } },
   { name: "night", selector: { color_rgb: {} } },
-  { name: "text", selector: { text: {} } },
+  { name: "text", selector: { color_rgb: {} } },
 ];
 
 const LABELS: Record<string, string> = {
@@ -122,6 +122,18 @@ const hexToRgb = (hex: string): [number, number, number] => {
 
 const rgbToHex = ([r, g, b]: [number, number, number]): string =>
   "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+
+const resolveTextColor = (text?: string): [number, number, number] => {
+  if (text && /^#/.test(text)) return hexToRgb(text);
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--primary-text-color")
+    .trim();
+  const hex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(raw);
+  if (hex) return [parseInt(hex[1], 16), parseInt(hex[2], 16), parseInt(hex[3], 16)];
+  const rgb = /rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/.exec(raw);
+  if (rgb) return [parseInt(rgb[1]), parseInt(rgb[2]), parseInt(rgb[3])];
+  return [255, 255, 255];
+};
 
 const toArray = (val: string | string[] | undefined, fallback: string[]) =>
   val === undefined ? fallback : typeof val === "string" ? [val] : val;
@@ -184,7 +196,7 @@ export class SimpleWeatherCardEditor extends LitElement {
       ...val,
       ...(Array.isArray(val.day) && { day: rgbToHex(val.day as [number, number, number]) }),
       ...(Array.isArray(val.night) && { night: rgbToHex(val.night as [number, number, number]) }),
-    };
+      ...(Array.isArray(val.text) && { text: rgbToHex(val.text as [number, number, number]) }),    };
     fireEvent(this, "config-changed", {
       config: { ...this._config, backdrop, custom: mapToCustom(this._customMap) },
     });
@@ -295,6 +307,7 @@ export class SimpleWeatherCardEditor extends LitElement {
               ...this._config?.backdrop,
               day: hexToRgb(this._config?.backdrop?.day ?? "#45aaf2"),
               night: hexToRgb(this._config?.backdrop?.night ?? "#a55eea"),
+              text: resolveTextColor(this._config?.backdrop?.text),
             }}
             .schema=${BACKDROP_SCHEMA}
             .computeLabel=${this._computeLabel}
