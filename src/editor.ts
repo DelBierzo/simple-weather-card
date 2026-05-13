@@ -14,6 +14,7 @@ const INFO_OPTIONS = [
   { value: "precipitation", label: "Precipitation" },
   { value: "precipitation_probability", label: "Precipitation probability" },
   { value: "humidity", label: "Humidity" },
+  { value: "wind", label: "Wind (Speed / Bearing)" },
   { value: "wind_speed", label: "Wind speed" },
   { value: "wind_bearing", label: "Wind bearing" },
   { value: "pressure", label: "Pressure" },
