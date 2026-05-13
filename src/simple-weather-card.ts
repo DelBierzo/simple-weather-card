@@ -250,6 +250,22 @@ export class SimpleWeatherCard extends LitElement {
       : "";
   }
 
+  private renderPrecipitation(): TemplateResult | string {
+    const precip = this.custom.precipitation?.state ?? this.weather?.getAttribute("precipitation");
+    const prob = this.custom.precipitation_probability?.state ?? this.weather?.getAttribute("precipitation_probability");
+    return precip || prob
+      ? html`
+          <span class="weather__info__item">
+            <div
+              class="weather__icon weather__icon--small"
+              style="background-image: url(${this.weather?.getIcon("rainy")})"
+            ></div>
+            ${this.renderAttr("precipitation")}${precip && prob ? html` / ${this.renderAttr("precipitation_probability")}` : ""}
+          </span>
+        `
+      : "";
+  }
+
   private renderWind(): TemplateResult | string {
     const speed = this.custom.wind_speed?.state ?? this.weather?.getAttribute("wind_speed");
     const bearing = this.custom.wind_bearing?.state ?? this.weather?.getAttribute("wind_bearing");
@@ -289,6 +305,7 @@ export class SimpleWeatherCard extends LitElement {
 
   private renderInfo(attr: string): TemplateResult | string {
     if (attr === "extrema") return this.renderExtrema();
+    if (attr === "precipitation_and_probability") return this.renderPrecipitation();
     if (attr === "wind") return this.renderWind();
     return html`
       <span class="weather__info__item">
